@@ -61,32 +61,95 @@ def obtener_lista_gastos():
             conexion.close()
 
 def vista_lista_gastos():
-    global vista_lista_gastos_frame  # Declarar vista_lista_gastos_frame como global
+    global vista_lista_gastos_frame
 
     if vista_lista_gastos_frame is not None:
-        # Limpiar los widgets dentro del Frame
         vista_lista_gastos_frame.destroy()
     vista_lista_gastos_frame = Frame(pagina3, bg="lightblue")
     vista_lista_gastos_frame.pack()
 
-    # Obtener la lista de gastos desde la base de datos
-    conn = sqlite3.connect("mi_basededatos.db")  # Asegúrate de usar el nombre correcto de tu base de datos
+    conn = sqlite3.connect("mi_basededatos.db")
     cursor = conn.cursor()
-    cursor.execute("SELECT id, nombre, cantidad, categoria FROM gastos ORDER BY id DESC")  # Ordenar por ID en orden descendente
+    cursor.execute("SELECT id, nombre, cantidad, categoria FROM gastos ORDER BY id DESC")
     rows = cursor.fetchall()
 
-    # Mostrar los gastos en la lista de la interfaz con botón de edición
     for row in rows:
         id_gasto, nombre_gasto, cantidad_gasto, categoria_gasto = row
         gasto_label = Label(vista_lista_gastos_frame, text=f"{nombre_gasto}: ${cantidad_gasto} - Categoría: {categoria_gasto}", bg="lightblue")
-        editar_button = Button(vista_lista_gastos_frame, text="Editar")
+
+        editar_button = Button(vista_lista_gastos_frame, text="Editar", command=lambda id_gasto=id_gasto: editar_gasto(id_gasto))
         eliminar_button = Button(vista_lista_gastos_frame, text="Eliminar", command=lambda id_gasto=id_gasto: eliminar_gasto(id_gasto))
 
-        gasto_label.grid(row=rows.index(row), column=0)  # Coloca el label en la columna 0
-        editar_button.grid(row=rows.index(row), column=1)  # Coloca el botón en la columna 1
+        gasto_label.grid(row=rows.index(row), column=0)
+        editar_button.grid(row=rows.index(row), column=1)
         eliminar_button.grid(row=rows.index(row), column=2)
 
     conn.close()
+def editar_gasto(gasto_id):
+    global vista_lista_gastos_frame
+
+    try:
+        conexion = sqlite3.connect("mi_basededatos.db")
+        cursor = conexion.cursor()
+        cursor.execute("SELECT nombre, cantidad, fecha, categoria FROM gastos WHERE id = ?", (gasto_id,))
+        gasto = cursor.fetchone()
+
+        if gasto:
+            nombre, cantidad, fecha, categoria = gasto
+
+            # Crear y configurar los elementos de edición
+            editar_frame = Frame(vista_lista_gastos_frame, bg="lightblue")
+            editar_frame.grid(row=gasto_id, column=0, columnspan=3, sticky="ew")  # El parámetro sticky asegura que se extienda horizontalmente
+
+            nombre_label = Label(editar_frame, text="Nombre:", bg='lightblue')
+            nombre_label.grid(row=0, column=0)
+            nombre_entry = Entry(editar_frame)
+            nombre_entry.grid(row=0, column=1)
+            nombre_entry.insert(0, nombre)
+
+            cantidad_label = Label(editar_frame, text="Cantidad:", bg='lightblue')
+            cantidad_label.grid(row=1, column=0)
+            cantidad_entry = Entry(editar_frame)
+            cantidad_entry.grid(row=1, column=1)
+            cantidad_entry.insert(0, cantidad)
+
+            fecha_label = Label(editar_frame, text="Fecha:", bg='lightblue')
+            fecha_label.grid(row=2, column=0)
+            fecha_entry = Entry(editar_frame)
+            fecha_entry.grid(row=2, column=1)
+            fecha_entry.insert(0, fecha)
+
+            categoria_label = Label(editar_frame, text="Categoría:", bg='lightblue')
+            categoria_label.grid(row=3, column=0)
+            categorias = ["Alimentos", "Transporte", "Entretenimiento", "Salud", "Otros"]
+            categoria_combobox = ttk.Combobox(editar_frame, values=categorias)
+            categoria_combobox.grid(row=3, column=1)
+            categoria_combobox.set(categoria)
+
+            # Crear un botón para guardar cambios y asociarlo a la función guardar_cambios
+            guardar_button = Button(editar_frame, text="Guardar Cambios", command=lambda: guardar_cambios(gasto_id, nombre_entry, cantidad_entry, fecha_entry, categoria_combobox))
+            guardar_button.grid(row=4, column=0, columnspan=2, pady=10)  # Agrega espacio entre el botón y los campos de edición
+
+    except sqlite3.Error as error:
+        print("Error al editar el gasto:", error)
+
+def guardar_cambios(gasto_id, nombre_entry, cantidad_entry, fecha_entry, categoria_combobox):
+    nuevo_nombre = nombre_entry.get()
+    nuevo_cantidad = float(cantidad_entry.get())
+    nueva_fecha = fecha_entry.get()
+    nueva_categoria = categoria_combobox.get()
+
+    try:
+        conexion = sqlite3.connect("mi_basededatos.db")
+        cursor = conexion.cursor()
+        cursor.execute("UPDATE gastos SET nombre = ?, cantidad = ?, fecha = ?, categoria = ? WHERE id = ?", (nuevo_nombre, nuevo_cantidad, nueva_fecha, nueva_categoria, gasto_id))
+        conexion.commit()
+        conexion.close()
+
+        vista_lista_gastos()  # Actualizar la lista de gastos en la interfaz después de guardar los cambios
+
+    except sqlite3.Error as error:
+        print("Error al guardar los cambios:", error)
 
 def eliminar_gasto(gasto_id):
     global vista_lista_gastos_frame
