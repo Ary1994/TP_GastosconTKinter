@@ -48,7 +48,7 @@ def obtener_lista_gastos():
 
         # Limpiar el Listbox antes de agregar nuevos datos
         lista_gastos.delete(0, END)
-
+       
         # Agregar los gastos al Listbox
         for gasto in gastos:
             lista_gastos.insert(END, f"{gasto[0]} x {gasto[1]},\n Fecha: {gasto[2]}, Cat: {gasto[3]}")
@@ -59,6 +59,58 @@ def obtener_lista_gastos():
     finally:
         if conexion:
             conexion.close()
+
+def vista_lista_gastos():
+    global vista_lista_gastos_frame  # Declarar vista_lista_gastos_frame como global
+
+    if vista_lista_gastos_frame is not None:
+        # Limpiar los widgets dentro del Frame
+        vista_lista_gastos_frame.destroy()
+    vista_lista_gastos_frame = Frame(pagina3, bg="lightblue")
+    vista_lista_gastos_frame.pack()
+
+    # Obtener la lista de gastos desde la base de datos
+    conn = sqlite3.connect("mi_basededatos.db")  # Asegúrate de usar el nombre correcto de tu base de datos
+    cursor = conn.cursor()
+    cursor.execute("SELECT id, nombre, cantidad, categoria FROM gastos ORDER BY id DESC")  # Ordenar por ID en orden descendente
+    rows = cursor.fetchall()
+
+    # Mostrar los gastos en la lista de la interfaz con botón de edición
+    for row in rows:
+        id_gasto, nombre_gasto, cantidad_gasto, categoria_gasto = row
+        gasto_label = Label(vista_lista_gastos_frame, text=f"{nombre_gasto}: ${cantidad_gasto} - Categoría: {categoria_gasto}", bg="lightblue")
+        editar_button = Button(vista_lista_gastos_frame, text="Editar")
+        eliminar_button = Button(vista_lista_gastos_frame, text="Eliminar", command=lambda id_gasto=id_gasto: eliminar_gasto(id_gasto))
+
+        gasto_label.grid(row=rows.index(row), column=0)  # Coloca el label en la columna 0
+        editar_button.grid(row=rows.index(row), column=1)  # Coloca el botón en la columna 1
+        eliminar_button.grid(row=rows.index(row), column=2)
+
+    conn.close()
+
+def eliminar_gasto(gasto_id):
+    global vista_lista_gastos_frame
+
+    # Obtener el ID del gasto seleccionado
+    print(gasto_id)
+
+    try:
+        conexion = sqlite3.connect("mi_basededatos.db")
+        cursor = conexion.cursor()
+
+        # Eliminar el gasto de la base de datos
+        cursor.execute("DELETE FROM gastos WHERE id = ?", (gasto_id,))
+
+        conexion.commit()
+        conexion.close()
+
+        vista_lista_gastos()  # Actualizar la lista de gastos en la interfaz
+
+
+    except sqlite3.Error as error:
+        print("Error al eliminar el gasto de la base de datos:", error)
+#variables globales
+vista_lista_gastos_frame = None
 
 ventana1 = Tk()
 ventana1.title("Registro Gastos")
@@ -86,7 +138,8 @@ pagina1 = Frame(cuaderno1)
 pagina2 = Frame(cuaderno1)
 pagina3 = Frame(cuaderno1)
 pagina4 = Frame(cuaderno1)
-
+pagina2.configure(bg="lightblue")
+pagina3.configure(bg="lightblue")
 # Agregamos pestañas creadas
 cuaderno1.add(pagina1, text="Registrar Gtos")
 cuaderno1.add(pagina2, text="Resumen Gtos")
@@ -95,12 +148,6 @@ cuaderno1.add(pagina4, text="Descargar ")
 
 # Configurar la imagen de fondo en las pestañas
 fondo_label = Label(pagina1, image=imagen_fondo)
-fondo_label.place(x=0, y=0, relwidth=1, relheight=1)
-
-fondo_label = Label(pagina2, image=imagen_fondo)
-fondo_label.place(x=0, y=0, relwidth=1, relheight=1)
-
-fondo_label = Label(pagina3, image=imagen_fondo)
 fondo_label.place(x=0, y=0, relwidth=1, relheight=1)
 
 fondo_label = Label(pagina4, image=imagen_fondo)
@@ -139,11 +186,16 @@ agregar_button.pack()
 lista_gastos_label = Label(pagina2, text="Lista de Gastos Generales", bg='lightblue')
 lista_gastos_label.pack(pady=10)
 
-lista_gastos = Listbox(pagina2, bg='lightblue',width=30)
+lista_gastos = Listbox(pagina2, bg='lightblue',width=50)
 lista_gastos.pack()
 
 # Botón para obtener la lista de gastos
 obtener_lista_button = Button(pagina2, text="Obtener Lista de Gastos", command=obtener_lista_gastos)
+obtener_lista_button.pack()
+
+
+# Elementos página 3
+obtener_lista_button = Button(pagina3, text="Obtener Lista de Gastos", command=vista_lista_gastos)
 obtener_lista_button.pack()
 
 # Main loop
