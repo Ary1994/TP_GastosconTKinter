@@ -1,4 +1,4 @@
-import tkinter as tk
+"""import tkinter as tk
 from tkinter import ttk
 import sqlite3
 import threading
@@ -233,4 +233,4 @@ vista_filtrar_categoria_frame = tk.Frame(root)
 
 # Ejecutar la aplicación
 conectar_base_datos()  # Llama a esta función para asegurarte de que la base de datos esté creada
-root.mainloop()
+root.mainloop()"""
