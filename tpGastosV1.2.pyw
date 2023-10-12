@@ -200,21 +200,20 @@ cuaderno1.pack(fill="both", expand="yes")
 pagina1 = Frame(cuaderno1)
 pagina2 = Frame(cuaderno1)
 pagina3 = Frame(cuaderno1)
-pagina4 = Frame(cuaderno1)
+
 pagina2.configure(bg="lightblue")
 pagina3.configure(bg="lightblue")
 # Agregamos pestañas creadas
 cuaderno1.add(pagina1, text="Registrar Gtos")
 cuaderno1.add(pagina2, text="Resumen Gtos")
 cuaderno1.add(pagina3, text="Editar Gtos")
-cuaderno1.add(pagina4, text="Descargar ")
+
 
 # Configurar la imagen de fondo en las pestañas
 fondo_label = Label(pagina1, image=imagen_fondo)
 fondo_label.place(x=0, y=0, relwidth=1, relheight=1)
 
-fondo_label = Label(pagina4, image=imagen_fondo)
-fondo_label.place(x=0, y=0, relwidth=1, relheight=1)
+
 
 # Elementos Pestaña 1
 titulo_label = Label(pagina1, text="Registro de Gasto", font=("Helvetica", 14), bg='lightblue', relief='solid')
