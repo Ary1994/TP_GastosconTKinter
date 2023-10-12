@@ -21,7 +21,7 @@ def agregar_gasto(nombre, cantidad, fecha, categoria):
         conexion.commit()
 
         print("Gasto agregado exitosamente en la base de datos.")
-
+        vista_lista_gastos()
     except sqlite3.Error as error:
         print("Error al agregar el gasto en la base de datos:", error)
     finally:
@@ -62,6 +62,7 @@ def obtener_lista_gastos():
 
 def vista_lista_gastos():
     global vista_lista_gastos_frame
+    obtener_lista_button.pack_forget()
 
     if vista_lista_gastos_frame is not None:
         vista_lista_gastos_frame.destroy()
@@ -257,8 +258,13 @@ obtener_lista_button.pack()
 
 
 # Elementos página 3
+lista_gastos_label = Label(pagina3, text="Editar gastos ", bg='lightblue')
+lista_gastos_label.pack(pady=10)
 obtener_lista_button = Button(pagina3, text="Obtener Lista de Gastos", command=vista_lista_gastos)
 obtener_lista_button.pack()
+# ... otros elementos de la interfaz
+
+
 
 # Main loop
 ventana1.mainloop()
