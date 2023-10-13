@@ -148,7 +148,7 @@ def guardar_cambios(gasto_id, nombre_entry, cantidad_entry, fecha_entry, categor
         conexion.close()
 
         vista_lista_gastos()  # Actualizar la lista de gastos en la interfaz después de guardar los cambios
-
+        print("Edición exitosa")
     except sqlite3.Error as error:
         print("Error al guardar los cambios:", error)
 
@@ -164,7 +164,7 @@ def eliminar_gasto(gasto_id):
 
         # Eliminar el gasto de la base de datos
         cursor.execute("DELETE FROM gastos WHERE id = ?", (gasto_id,))
-
+        print("Eliminacion exitosa")
         conexion.commit()
         conexion.close()
 
