@@ -265,6 +265,6 @@ obtener_lista_button.pack()
 # ... otros elementos de la interfaz
 
 
-
+ventana1.iconbitmap('notebook.ico')
 # Main loop
 ventana1.mainloop()
