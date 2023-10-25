@@ -93,6 +93,7 @@ class GastosManager:
 
 
     def eliminar_gasto(self, tree):
+
         selected_item = tree.selection()
         if selected_item:
             id_gasto = tree.item(selected_item, "values")[-1]
@@ -116,3 +117,67 @@ class GastosManager:
             finally:
                 if conexion:
                     conexion.close()
+
+
+    def abrir_ventana_edicion(self, tree, selected_item):
+        ventana_edicion = Toplevel(self.main_window.root)
+        ventana_edicion.title("Editar Gasto")
+        ventana_edicion.iconbitmap('notebook.ico')
+        ventana_edicion.configure(bg="lightblue")
+
+        # Agrega etiquetas y campos de entrada para editar los datos
+        nombre_label = Label(ventana_edicion, text="Nuevo Nombre del gasto:", bg='lightblue')
+        nombre_label.pack()
+        nuevo_nombre_entry = Entry(ventana_edicion)
+        nuevo_nombre_entry.pack()
+
+        cantidad_label = Label(ventana_edicion, text="Nuevo Precio:", bg='lightblue')
+        cantidad_label.pack()
+        nuevo_cantidad_entry = Entry(ventana_edicion)
+        nuevo_cantidad_entry.pack()
+
+        fecha_label = Label(ventana_edicion, text="Nueva Fecha:", bg='lightblue')
+        fecha_label.pack()
+        nueva_fecha_entry = Entry(ventana_edicion)
+        nueva_fecha_entry.pack()
+        categoria_label = Label( ventana_edicion,text="Categoría:", bg='lightblue')
+        categoria_label.pack()
+        categorias = ["Alimentos", "Transporte", "Entretenimiento", "Salud", "Otros"]
+        categoria_combobox = ttk.Combobox(ventana_edicion, values=categorias)
+        categoria_combobox.pack()
+
+        # Obtén los datos actuales del gasto seleccionado
+        item = tree.item(selected_item)
+        item_values = item["values"]
+        nuevo_nombre_entry.insert(0, item_values[0])
+        nuevo_cantidad_entry.insert(0, item_values[1])
+        nueva_fecha_entry.insert(0, item_values[2])
+        categoria_combobox.set(item_values[3])
+        # Agrega un botón para guardar los cambios
+        guardar_cambios_button = Button(ventana_edicion, text="Guardar Cambios", command=lambda: self.guardar_cambios(tree, selected_item, nuevo_nombre_entry.get(), nuevo_cantidad_entry.get(), nueva_fecha_entry.get(), categoria_combobox.get()))
+        guardar_cambios_button.pack()
+  
+    def guardar_cambios(self, tree, selected_item, nuevo_nombre, nuevo_cantidad, nueva_fecha,nueva_categoria):
+        id_gasto = tree.item(selected_item, "values")[-1]
+
+        try:
+            conexion = sqlite3.connect("mi_basededatos.db")
+            cursor = conexion.cursor()
+
+            # Actualiza los datos del gasto en la base de datos
+            cursor.execute("UPDATE gastos SET nombre=?, cantidad=?, fecha=? ,categoria =? WHERE id=?", (nuevo_nombre, nuevo_cantidad, nueva_fecha, nueva_categoria,id_gasto))
+               
+            # Confirma la transacción
+            conexion.commit()
+
+            # Actualiza la vista en el Treeview
+            tree.item(selected_item, values=(nuevo_nombre, nuevo_cantidad, nueva_fecha, nueva_categoria,id_gasto))
+
+            print(f"Gasto con ID {id_gasto} actualizado exitosamente.")
+        except sqlite3.Error as error:
+            print("Error al actualizar el gasto en la base de datos:", error)
+        finally:
+            if conexion:
+                conexion.close()
+        
+

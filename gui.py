@@ -73,7 +73,8 @@ class MainWindow:
         obtener_lista_button.pack()
     
     def init_page3(self):
-        lista_gastos_label = Label(self.page3,text="Editar gastos ", bg='lightblue')
+        
+        lista_gastos_label = Label(self.page3, text="Editar gastos", bg='lightblue')
         lista_gastos_label.pack(pady=10)
         columns = ("Nombre", "Precio", "Fecha", "Categoría")
         tree = ttk.Treeview(self.page3, columns=columns, show="headings")
@@ -81,13 +82,17 @@ class MainWindow:
             tree.heading(col, text=col)
             tree.column(col, width=100)
         tree.pack()
-        obtener_lista_button = Button(self.page3, text="Obtener Lista de Gastos", command=lambda: self.gastos_manager.vista_lista_gastos(tree))
-        obtener_lista_button.pack()
-        editar_button = Button(self.page3, text="Editar Gasto", command=lambda: self.gastos_manager.editar_gasto(tree))
-        editar_button.pack()
 
+        editar_button = Button(self.page3, text="Editar Gasto", command=lambda: self.gastos_manager.abrir_ventana_edicion(tree, tree.selection()[0]))
         eliminar_button = Button(self.page3, text="Eliminar Gasto", command=lambda: self.gastos_manager.eliminar_gasto(tree))
-        eliminar_button.pack()
+
+        # Botón para obtener la lista de gastos
+        obtener_lista_button = Button(self.page3, text="Obtener Lista de Gastos", command=lambda: (self.gastos_manager.vista_lista_gastos(tree), obtener_lista_button.pack_forget(), editar_button.pack(side="left"), eliminar_button.pack(side="right")))
+        obtener_lista_button.pack()
+
+   
+
+
 
  
 
