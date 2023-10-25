@@ -8,7 +8,7 @@ class GastosManager:
     def __init__(self,main_window):
         self.conexion = sqlite3.connect("mi_basededatos.db")
         self.main_window = main_window
-
+        
     def agregar_gasto(self, nombre, cantidad, fecha, categoria):
         try:
             # Conectarse a la base de datos (o crearla si no existe)
@@ -79,26 +79,22 @@ class GastosManager:
         categoria = categoria_combobox.get()
         self.agregar_gasto(nombre, cantidad, fecha, categoria)
 
-    def vista_lista_gastos(self, obtener_lista_button):
-        if GastosManager.vista_lista_gastos_frame is not None:
-            GastosManager.vista_lista_gastos_frame.destroy()
-        GastosManager.vista_lista_gastos_frame = Frame(self.page3, bg="lightblue")
-        GastosManager.vista_lista_gastos_frame.pack()
+    def vista_lista_gastos(self, tree, page3):
+        # Limpiar la tabla antes de insertar nuevos registros
+        for item in tree.get_children():
+            tree.delete(item)
 
         conn = sqlite3.connect("mi_basededatos.db")
         cursor = conn.cursor()
-        cursor.execute("SELECT id, nombre, cantidad, categoria FROM gastos ORDER BY id DESC")
+        cursor.execute("SELECT id, nombre, cantidad, fecha, categoria FROM gastos ORDER BY id DESC")
         rows = cursor.fetchall()
 
         for row in rows:
-            id_gasto, nombre_gasto, cantidad_gasto, categoria_gasto = row
-            gasto_label = Label(GastosManager.vista_lista_gastos_frame, text=f"{nombre_gasto}: ${cantidad_gasto} - Categoría: {categoria_gasto}", bg="lightblue")
-
-            editar_button = Button(GastosManager.vista_lista_gastos_frame, text="Editar", command=lambda id_gasto=id_gasto: self.editar_gasto(id_gasto))
-            eliminar_button = Button(GastosManager.vista_lista_gastos_frame, text="Eliminar", command=lambda id_gasto=id_gasto: self.eliminar_gasto(id_gasto))
-
-            gasto_label.grid(row=rows.index(row), column=0)
-            editar_button.grid(row=rows.index(row), column=1)
-            eliminar_button.grid(row=rows.index(row), column=2)
+            id_gasto, nombre_gasto, cantidad_gasto, fecha_gasto, categoria_gasto = row
+            editar_button = Button(page3, text="Editar", command=lambda id_gasto=id_gasto: self.editar_gasto(id_gasto))
+            eliminar_button = Button(page3, text="Eliminar", command=lambda id_gasto=id_gasto: self.eliminar_gasto(id_gasto))
+         
+            tree.insert("", "end", values=(nombre_gasto, cantidad_gasto, fecha_gasto, categoria_gasto, editar_button, eliminar_button))
 
         conn.close()
+

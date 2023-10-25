@@ -4,7 +4,7 @@ from gastos import GastosManager
 
 class MainWindow:
     def __init__(self, root):
-       
+
         self.root = root
         self.root.title("Registro Gastos")
         self.root.iconbitmap('notebook.ico')
@@ -71,11 +71,17 @@ class MainWindow:
 
         obtener_lista_button = Button(self.page2,text="Obtener Lista de Gastos",command=lambda: self.gastos_manager.obtener_lista_gastos(lista_gastos))
         obtener_lista_button.pack()
-
+    
     def init_page3(self):
         lista_gastos_label = Label(self.page3,text="Editar gastos ", bg='lightblue')
         lista_gastos_label.pack(pady=10)
-        obtener_lista_button = Button(self.page3,text="Obtener Lista de Gastos",command=lambda: self.gastos_manager.vista_lista_gastos(obtener_lista_button))
+        columns = ("Nombre", "Precio", "Fecha", "Categoría","Accion")
+        tree = ttk.Treeview(self.page3, columns=columns, show="headings")
+        for col in columns:
+            tree.heading(col, text=col)
+            tree.column(col, width=100)
+        tree.pack()
+        obtener_lista_button = Button(self.page3, text="Obtener Lista de Gastos", command=lambda: self.gastos_manager.vista_lista_gastos(tree, self.page3))
         obtener_lista_button.pack()
 
  
