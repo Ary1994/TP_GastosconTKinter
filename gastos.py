@@ -84,6 +84,37 @@ class GastosManager:
                         tags=("editable", "editable", "editable", "editable"))
 
         conn.close()
+    def filtrar_lista_gastos(self, lista_gastos_widget, fecha_filtro, categoria_filtro, nombre_filtro):
+        try:
+            conexion = sqlite3.connect("mi_basededatos.db")
+            cursor = conexion.cursor()
+
+            # Consulta SQL para obtener los gastos con filtrado
+            consulta = "SELECT nombre, cantidad, fecha, categoria FROM gastos WHERE 1=1"
+
+            if fecha_filtro:
+                consulta += f" AND fecha = '{fecha_filtro}'"
+            if categoria_filtro:
+                consulta += f" AND categoria = '{categoria_filtro}'"
+            if nombre_filtro:
+                consulta += f" AND nombre = '{nombre_filtro}'"
+
+            cursor.execute(consulta)
+            gastos = cursor.fetchall()
+
+            # Limpiar el Listbox antes de agregar nuevos datos
+            lista_gastos_widget.delete(0, END)
+
+            # Agregar los gastos al Listbox
+            for gasto in gastos:
+                lista_gastos_widget.insert(END, f"{gasto[0]} x {gasto[1]},\n Fecha: {gasto[2]}, Cat: {gasto[3]}")
+            conexion.commit()
+
+        except sqlite3.Error as error:
+            print("Error al obtener la lista de gastos:", error)
+        finally:
+            if conexion:
+                conexion.close()
 
 
     def eliminar_gasto(self, tree):

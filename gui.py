@@ -62,14 +62,43 @@ class MainWindow:
         agregar_button.pack()
 
     def init_page2(self):
-        
-        lista_gastos_label = Label(self.page2,text="Lista de Gastos Generales", bg='lightblue')
+        lista_gastos_label = Label(self.page2, text="Lista de Gastos Generales", bg='lightblue')
         lista_gastos_label.pack(pady=10)
 
-        lista_gastos = Listbox(self.page2, bg='lightblue',width=50)
+        # Crear los widgets de filtrado
+        filtro_frame = Frame(self.page2, bg='lightblue')
+        filtro_frame.pack()
+
+        filtro_label = Label(filtro_frame, text="Filtrar por:", bg='lightblue')
+        filtro_label.grid(row=0, column=0)
+
+        fecha_label = Label(filtro_frame, text="Fecha:", bg='lightblue')
+        fecha_label.grid(row=0, column=1)
+        fecha_entry = Entry(filtro_frame)
+        fecha_entry.grid(row=0, column=2)
+
+        categoria_label = Label(filtro_frame, text="Categoría:", bg='lightblue')
+        categoria_label.grid(row=0, column=3)
+        categorias = ["", "Alimentos", "Transporte", "Entretenimiento", "Salud", "Otros"]
+        categoria_combobox = ttk.Combobox(filtro_frame, values=categorias)
+        categoria_combobox.grid(row=0, column=4)
+
+        nombre_label = Label(filtro_frame, text="Nombre:", bg='lightblue')
+        nombre_label.grid(row=0, column=5)
+        nombre_entry = Entry(filtro_frame)
+        nombre_entry.grid(row=0, column=6)
+
+        # Botón para aplicar el filtro
+        aplicar_filtro_button = Button(filtro_frame, text="Aplicar Filtro",
+                                command=lambda: self.gastos_manager.filtrar_lista_gastos(lista_gastos, fecha_entry.get(), categoria_combobox.get(), nombre_entry.get()))
+        aplicar_filtro_button.grid(row=0, column=7)
+
+        # Lista de gastos
+        lista_gastos = Listbox(self.page2, bg='lightblue', width=50)
         lista_gastos.pack()
 
-        obtener_lista_button = Button(self.page2,text="Obtener Lista de Gastos",command=lambda: self.gastos_manager.obtener_lista_gastos(lista_gastos))
+        obtener_lista_button = Button(self.page2, text="Obtener Todos los Gastos",
+                                command=lambda: self.gastos_manager.obtener_lista_gastos(lista_gastos))
         obtener_lista_button.pack()
     
     def init_page3(self):
