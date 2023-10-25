@@ -80,24 +80,18 @@ class GastosManager:
             
 
             # Inserta los botones como valores en el ttk.Treeview
-            tree.insert("", "end", values=(nombre_gasto, cantidad_gasto, fecha_gasto, categoria_gasto, "", ""),
+            tree.insert("", "end", values=(id_gasto,nombre_gasto, cantidad_gasto, fecha_gasto, categoria_gasto, "", ""),
                         tags=("editable", "editable", "editable", "editable"))
 
         conn.close()
-
-    def editar_gasto(self, tree):
-            selected_item = tree.selection()
-            if selected_item:
-                id_gasto = tree.item(selected_item, "values")[-1]
-                # Aquí debes implementar la lógica para la edición del gasto con el ID id_gasto
 
 
     def eliminar_gasto(self, tree):
 
         selected_item = tree.selection()
         if selected_item:
-            id_gasto = tree.item(selected_item, "values")[-1]
-
+            id_gasto = tree.item(selected_item, "values")[0]
+            print("este es el id ",id_gasto)
             try:
                 conexion = sqlite3.connect("mi_basededatos.db")
                 cursor = conexion.cursor()
@@ -149,16 +143,16 @@ class GastosManager:
         # Obtén los datos actuales del gasto seleccionado
         item = tree.item(selected_item)
         item_values = item["values"]
-        nuevo_nombre_entry.insert(0, item_values[0])
-        nuevo_cantidad_entry.insert(0, item_values[1])
-        nueva_fecha_entry.insert(0, item_values[2])
-        categoria_combobox.set(item_values[3])
+        nuevo_nombre_entry.insert(0, item_values[1])
+        nuevo_cantidad_entry.insert(0, item_values[2])
+        nueva_fecha_entry.insert(0, item_values[3])
+        categoria_combobox.set(item_values[4])
         # Agrega un botón para guardar los cambios
         guardar_cambios_button = Button(ventana_edicion, text="Guardar Cambios", command=lambda: self.guardar_cambios(tree, selected_item, nuevo_nombre_entry.get(), nuevo_cantidad_entry.get(), nueva_fecha_entry.get(), categoria_combobox.get()))
         guardar_cambios_button.pack()
   
     def guardar_cambios(self, tree, selected_item, nuevo_nombre, nuevo_cantidad, nueva_fecha,nueva_categoria):
-        id_gasto = tree.item(selected_item, "values")[-1]
+        id_gasto = tree.item(selected_item, "values")[0]
 
         try:
             conexion = sqlite3.connect("mi_basededatos.db")
@@ -171,7 +165,7 @@ class GastosManager:
             conexion.commit()
 
             # Actualiza la vista en el Treeview
-            tree.item(selected_item, values=(nuevo_nombre, nuevo_cantidad, nueva_fecha, nueva_categoria,id_gasto))
+            tree.item(selected_item, values=(id_gasto,nuevo_nombre, nuevo_cantidad, nueva_fecha, nueva_categoria))
 
             print(f"Gasto con ID {id_gasto} actualizado exitosamente.")
         except sqlite3.Error as error:

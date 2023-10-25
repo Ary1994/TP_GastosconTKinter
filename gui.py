@@ -76,7 +76,7 @@ class MainWindow:
         
         lista_gastos_label = Label(self.page3, text="Editar gastos", bg='lightblue')
         lista_gastos_label.pack(pady=10)
-        columns = ("Nombre", "Precio", "Fecha", "Categoría")
+        columns = ("ID","Nombre", "Precio", "Fecha", "Categoría")
         tree = ttk.Treeview(self.page3, columns=columns, show="headings")
         for col in columns:
             tree.heading(col, text=col)
