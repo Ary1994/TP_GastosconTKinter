@@ -34,9 +34,6 @@ class GastosManager:
             if conexion:
                 conexion.close()
 
-        
-
-   
     def obtener_lista_gastos(self, lista_gastos):
         try:
             conexion = sqlite3.connect("mi_basededatos.db")
@@ -60,18 +57,6 @@ class GastosManager:
             if conexion:
                 conexion.close()
 
-
-    def editar_gasto(self, gasto_id):
-        # Implementar la función para editar un gasto
-        pass
-
-    def guardar_cambios(self, gasto_id, nombre, cantidad, fecha, categoria):
-        # Implementar la función para guardar cambios en un gasto
-        pass
-
-    def eliminar_gasto(self, gasto_id):
-        # Implementar la función para eliminar un gasto
-        pass
     def obtener_valores_y_agregar_gasto(self, nombre_entry, cantidad_entry, fecha_entry, categoria_combobox):
         nombre = nombre_entry.get()
         cantidad = float(cantidad_entry.get())
@@ -79,8 +64,8 @@ class GastosManager:
         categoria = categoria_combobox.get()
         self.agregar_gasto(nombre, cantidad, fecha, categoria)
 
-    def vista_lista_gastos(self, tree, page3):
-        # Limpiar la tabla antes de insertar nuevos registros
+    def vista_lista_gastos(self, tree):
+        # Borra la tabla antes de insertar nuevos registros
         for item in tree.get_children():
             tree.delete(item)
 
@@ -91,10 +76,43 @@ class GastosManager:
 
         for row in rows:
             id_gasto, nombre_gasto, cantidad_gasto, fecha_gasto, categoria_gasto = row
-            editar_button = Button(page3, text="Editar", command=lambda id_gasto=id_gasto: self.editar_gasto(id_gasto))
-            eliminar_button = Button(page3, text="Eliminar", command=lambda id_gasto=id_gasto: self.eliminar_gasto(id_gasto))
-         
-            tree.insert("", "end", values=(nombre_gasto, cantidad_gasto, fecha_gasto, categoria_gasto, editar_button, eliminar_button))
+
+            
+
+            # Inserta los botones como valores en el ttk.Treeview
+            tree.insert("", "end", values=(nombre_gasto, cantidad_gasto, fecha_gasto, categoria_gasto, "", ""),
+                        tags=("editable", "editable", "editable", "editable"))
 
         conn.close()
 
+    def editar_gasto(self, tree):
+            selected_item = tree.selection()
+            if selected_item:
+                id_gasto = tree.item(selected_item, "values")[-1]
+                # Aquí debes implementar la lógica para la edición del gasto con el ID id_gasto
+
+
+    def eliminar_gasto(self, tree):
+        selected_item = tree.selection()
+        if selected_item:
+            id_gasto = tree.item(selected_item, "values")[-1]
+
+            try:
+                conexion = sqlite3.connect("mi_basededatos.db")
+                cursor = conexion.cursor()
+
+                # Elimina el registro de gasto en la base de datos usando el ID
+                cursor.execute("DELETE FROM gastos WHERE id=?", (id_gasto,))
+
+                # Confirma la transacción
+                conexion.commit()
+
+                # Elimina la fila seleccionada del Treeview
+                tree.delete(selected_item)
+
+                print(f"Gasto con ID {id_gasto} eliminado exitosamente.")
+            except sqlite3.Error as error:
+                print("Error al eliminar el gasto en la base de datos:", error)
+            finally:
+                if conexion:
+                    conexion.close()
