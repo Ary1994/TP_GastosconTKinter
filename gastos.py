@@ -45,10 +45,13 @@ class GastosManager:
 
             # Limpiar el Listbox antes de agregar nuevos datos
             lista_gastos.delete(0, END)
-        
+            aux=0
             # Agregar los gastos al Listbox
             for gasto in gastos:
-                lista_gastos.insert(END, f"{gasto[0]} x {gasto[1]},\n Fecha: {gasto[2]}, Cat: {gasto[3]}")
+                lista_gastos.insert(END, f" Fecha: {gasto[2]}, Cat: {gasto[3]},{gasto[0]} x {gasto[1]}")
+                
+            
+            
             conexion.commit()
 
         except sqlite3.Error as error:
@@ -104,10 +107,15 @@ class GastosManager:
 
             # Limpiar el Listbox antes de agregar nuevos datos
             lista_gastos_widget.delete(0, END)
-
+            total_gasto=0
             # Agregar los gastos al Listbox
             for gasto in gastos:
+                cantidad = gasto[1]
+                total_gasto += cantidad
+
                 lista_gastos_widget.insert(END, f"{gasto[0]} x {gasto[1]},\n Fecha: {gasto[2]}, Cat: {gasto[3]}")
+            
+            lista_gastos_widget.insert(END, f"Gasto Total: {total_gasto}")
             conexion.commit()
 
         except sqlite3.Error as error:
