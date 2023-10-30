@@ -35,9 +35,6 @@ class MainWindow:
         self.init_page4()
     hex_color = "#FFFFFF"
     def cambiar_color_fondo(self):
-       
-        cambiar_color_button = Button(self.page1, text="Cambiar Color de Fondo", command=self.cambiar_color_fondo)
-        cambiar_color_button.pack()
         color, _ = colorchooser.askcolor(title="Seleccionar un color de fondo")
         
         self.hex_color = '#{:02x}{:02x}{:02x}'.format(int(color[0]), int(color[1]), int(color[2]))
