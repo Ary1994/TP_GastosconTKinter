@@ -217,6 +217,7 @@ class GastosManager:
             except sqlite3.Error as error:
                 print("Error al eliminar el gasto en la base de datos:", error)
             finally:
+                
                 # Cierra la conexión a la base de datos, si está abierta
                 if conexion:
                     conexion.close()

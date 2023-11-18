@@ -165,6 +165,7 @@ class MainWindow:
 
 if __name__ == "__main__":
     # Crea una ventana principal, instancia la clase MainWindow y el gestor de gastos, y ejecuta la GUI
+    
     root = Tk()
     app = MainWindow(root)
     gastos_manager = GastosManager(app)  # Pasa la referencia de MainWindow a GastosManager
